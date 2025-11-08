@@ -1,0 +1,15 @@
+{
+  "name": "fortisx/sdk",
+  "description": "Fortisx PHP SDK",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.0",
+    "guzzlehttp/guzzle": "^7.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "FortisX\\SDK\\": "src/"
+    }
+  }
+}
