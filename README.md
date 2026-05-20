@@ -26,9 +26,9 @@ $api = new API('YOUR_API_KEY');
 
 | Name | Type | Default | Description |
 |------|------|----------|--------------|
-| `$apiKey` | string | – | API key used for authorization |
-| `$baseUrl` | string | `https://api.fortisx.fi/v1` | Override if using a custom environment |
-| `$timeout` | int | `10` | Request timeout in seconds |
+| `$apiKey` | `?string` | `null` | API key used for authorization |
+| `$baseUrl` | `string` | `https://api.fortisx.fi/v1` | Override if using a custom environment |
+| `$timeout` | `int` | `10` | Request timeout in seconds |
 
 ---
 
@@ -36,16 +36,24 @@ $api = new API('YOUR_API_KEY');
 
 | Method | Arguments | Returns | Description |
 |--------|------------|----------|-------------|
-| `get(string $endpoint, array $params = [])` | endpoint path, optional params | array | Performs a GET request |
-| `post(string $endpoint, array $data = [])` | endpoint path, optional data | array | Performs a POST request |
-| `put(string $endpoint, array $data = [])` | endpoint path, optional data | array | Performs a PUT request |
-| `delete(string $endpoint)` | endpoint path | array | Performs a DELETE request |
+| `get(string $endpoint, array $params = []): array` | endpoint path, optional params | `array` | Performs a GET request |
+| `post(string $endpoint, array $data = []): array` | endpoint path, optional data | `array` | Performs a POST request |
+| `put(string $endpoint, array $data = []): array` | endpoint path, optional data | `array` | Performs a PUT request |
+| `delete(string $endpoint): array` | endpoint path | `array` | Performs a DELETE request |
 
-> All requests use `GuzzleHttp\Client` and automatically include the following headers:
+> All requests use `GuzzleHttp\Client` and include the following header:
+>
 > ```php
 > [
->   'Authorization' => "Bearer {$apiKey}",
->   'Accept' => 'application/json'
+>     'Accept' => 'application/json',
+> ]
+> ```
+>
+> If an API key is provided, the SDK also sends:
+>
+> ```php
+> [
+>     'Authorization' => "Bearer {$apiKey}",
 > ]
 > ```
 
@@ -58,12 +66,16 @@ When a network or server error occurs, an exception of type `APIError` is thrown
 ```php
 namespace FortisX\SDK;
 
-class APIError extends \Exception {
+class APIError extends \Exception
+{
     public int $status;
+
     public array $details;
 
-    public function __construct(string $message, int $status = 0, array $details = []) {
+    public function __construct(string $message, int $status = 0, array $details = [])
+    {
         parent::__construct($message);
+
         $this->status = $status;
         $this->details = $details;
     }
@@ -72,9 +84,9 @@ class APIError extends \Exception {
 
 | Field | Type | Description |
 |--------|------|-------------|
-| `$message` | string | Short description of the error |
-| `$status` | int | HTTP status code |
-| `$details` | array | Full response body if available |
+| `$err->getMessage()` | `string` | Short description of the error |
+| `$err->status` | `int` | HTTP status code |
+| `$err->details` | `array` | Full response body if available |
 
 **Example:**
 
@@ -86,11 +98,10 @@ $api = new API('demo-key');
 
 try {
     $res = $api->get('ping');
+
     print_r($res);
 } catch (APIError $err) {
     echo "API error [{$err->status}]: {$err->getMessage()}";
-} catch (Exception $e) {
-    echo "Unexpected error: {$e->getMessage()}";
 }
 ```
 
